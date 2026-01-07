@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { transactionAPI } from '../api/accountService';
+import { ACCOUNT_TYPES } from '../constants/accountTypes';
 
 function ExcelUpload({ onUploadSuccess }) {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
-  const [accountType, setAccountType] = useState('생활비');
+  const [accountType, setAccountType] = useState(ACCOUNT_TYPES.LIVING);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -54,8 +55,11 @@ function ExcelUpload({ onUploadSuccess }) {
             onChange={handleAccountTypeChange}
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="생활비">생활비</option>
-            <option value="전체관리통장">전체관리통장</option>
+            {Object.values(ACCOUNT_TYPES).map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
           </select>
         </div>
 

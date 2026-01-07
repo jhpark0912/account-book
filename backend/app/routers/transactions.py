@@ -8,6 +8,7 @@ import logging
 
 from .. import models, schemas
 from ..database import get_db
+from ..enums import AccountType, TransactionCategory
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -63,12 +64,12 @@ def parse_toss_excel(file_path: str) -> List[dict]:
 def auto_categorize(description: str, memo: str, db: Session) -> str:
     """거래처명과 메모를 기반으로 카테고리 자동 분류"""
     # 1. 메모에 카테고리가 명시되어 있는지 확인
-    categories = ["식비", "교통비", "주거생활비", "미용비", "건강관리비", "사회생활비", "문화생활비", "뚜이"]
-
     if memo:
-        for category in categories:
-            if category in memo:
-                return category
+        for category in TransactionCategory:
+            if category == TransactionCategory.UNCATEGORIZED:
+                continue
+            if category.value in memo:
+                return category.value
 
     # 2. 데이터베이스의 매핑 테이블에서 검색
     mappings = db.query(models.CategoryMapping).all()
@@ -77,13 +78,13 @@ def auto_categorize(description: str, memo: str, db: Session) -> str:
             return mapping.category
 
     # 3. 기본 카테고리 반환
-    return "미분류"
+    return TransactionCategory.UNCATEGORIZED
 
 
 @router.post("/upload", response_model=schemas.UploadResponse)
 async def upload_excel(
     file: UploadFile = File(...),
-    account_type: str = "생활비",
+    account_type: AccountType = AccountType.LIVING,
     db: Session = Depends(get_db)
 ):
     """Excel 파일 업로드 및 파싱"""
@@ -149,7 +150,7 @@ async def upload_excel(
 def get_transactions(
     year_month: str = None,
     category: str = None,
-    account_type: str = None,
+    account_type: AccountType = None,
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db)

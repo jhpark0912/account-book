@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { transactionAPI, categoryAPI } from '../api/accountService';
+import { ACCOUNT_TYPES } from '../constants/accountTypes';
+import { TRANSACTION_CATEGORIES } from '../constants/transactionCategories';
 
 function TransactionTable({ refreshTrigger }) {
   const [transactions, setTransactions] = useState([]);
@@ -8,7 +10,7 @@ function TransactionTable({ refreshTrigger }) {
   const [editingId, setEditingId] = useState(null);
   const [newCategory, setNewCategory] = useState('');
   const [error, setError] = useState(null);
-  const [accountType, setAccountType] = useState('생활비');
+  const [accountType, setAccountType] = useState(ACCOUNT_TYPES.LIVING);
 
   useEffect(() => {
     fetchCategories();
@@ -124,8 +126,11 @@ function TransactionTable({ refreshTrigger }) {
           onChange={(e) => setAccountType(e.target.value)}
           className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         >
-          <option value="생활비">생활비</option>
-          <option value="전체관리통장">전체관리통장</option>
+          {Object.values(ACCOUNT_TYPES).map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -196,7 +201,7 @@ function TransactionTable({ refreshTrigger }) {
                       }}
                       className="cursor-pointer hover:underline"
                     >
-                      {transaction.category || '미분류'}
+                      {transaction.category || TRANSACTION_CATEGORIES.UNCATEGORIZED}
                     </span>
                   )}
                 </td>

@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional
 
+from .enums import AccountType
+
 
 class TransactionBase(BaseModel):
     transaction_date: str
@@ -13,7 +15,7 @@ class TransactionBase(BaseModel):
     memo: Optional[str] = None
     category: Optional[str] = None
     year_month: str
-    account_type: str = "생활비"  # 계좌 유형 (생활비, 전체관리통장)
+    account_type: AccountType = AccountType.LIVING
 
 
 class TransactionCreate(TransactionBase):
