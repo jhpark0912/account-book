@@ -126,7 +126,7 @@ async def upload_excel(
                 db
             )
             trans_data["category"] = category
-            trans_data["account_type"] = account_type
+            trans_data["account_type"] = account_type.value
 
             # DB에 저장
             db_transaction = models.Transaction(**trans_data)
@@ -165,7 +165,7 @@ def get_transactions(
         query = query.filter(models.Transaction.category == category)
 
     if account_type:
-        query = query.filter(models.Transaction.account_type == account_type)
+        query = query.filter(models.Transaction.account_type == account_type.value)
 
     # 최신순 정렬
     query = query.order_by(models.Transaction.transaction_date.desc())

@@ -19,3 +19,9 @@
   - 기존에 코드 곳곳에 하드코딩된 문자열("생활비", "식비" 등)으로 관리되던 `account_type`과 `category`의 핵심 값들을 중앙에서 관리하는 방식으로 변경하여 코드의 안정성과 유지보수성을 크게 향상시켰습니다.
   - **백엔드:** `enums.py` 파일을 생성하여 `AccountType`과 `TransactionCategory` Enum을 정의했습니다. API 요청 시 이 Enum을 통해 데이터 유효성을 검증하여 잘못된 값이 시스템에 들어오는 것을 방지합니다.
   - **프론트엔드:** `constants` 디렉토리를 생성하고 `accountTypes.js`, `transactionCategories.js` 파일을 추가하여 관련 상수들을 관리합니다. React 컴포넌트들이 이 상수들을 사용하도록 리팩토링하여, 백엔드와 프론트엔드 간의 데이터 일관성을 확보하고 오타로 인한 버그 발생 가능성을 줄였습니다.
+
+## prompt for claude
+
+- When I asked for prompt then make md file in .claude\gemini
+- make prompt use english
+- 

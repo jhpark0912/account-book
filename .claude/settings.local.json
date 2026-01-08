@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_serena_serena__list_dir",
+      "mcp__plugin_serena_serena__activate_project",
+      "mcp__plugin_serena_serena__read_memory",
+      "mcp__plugin_serena_serena__read_file",
+      "mcp__plugin_serena_serena__get_symbols_overview",
+      "mcp__plugin_serena_serena__find_symbol",
+      "Bash([ ! -d venv ])",
+      "Bash(python -m venv:*)",
+      "Bash(source venv/Scripts/activate)",
+      "Bash(pip install:*)",
+      "mcp__plugin_serena_serena__search_for_pattern",
+      "mcp__plugin_serena_serena__replace_content",
+      "mcp__plugin_serena_serena__write_memory"
+    ]
+  }
+}

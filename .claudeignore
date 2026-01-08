@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+venv/
+
+# Python compiled files
+__pycache__/
+
+# Version control
+.git/
+
+# Agent specific files
+.serena/
+.claude/
+.gemini/
+
+# Uploaded or temporary data
+uploads/
+data/
+
+# Build artifacts (if they were to exist)
+build/
+dist/
+
+# Logs
+*.log
+
+# Editor/IDE specific files
+.vscode/
+.idea/

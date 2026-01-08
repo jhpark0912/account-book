@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { statisticsAPI } from '../api/accountService';
+import { ACCOUNT_TYPES } from '../constants/accountTypes';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D'];
 
@@ -11,7 +12,7 @@ function Statistics({ refreshTrigger }) {
   const [categoryStats, setCategoryStats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [accountType, setAccountType] = useState('생활비');
+  const [accountType, setAccountType] = useState(ACCOUNT_TYPES.LIVING);
 
   useEffect(() => {
     fetchAvailableMonths();
@@ -127,8 +128,11 @@ function Statistics({ refreshTrigger }) {
               onChange={(e) => setAccountType(e.target.value)}
               className="block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
             >
-              <option value="생활비">생활비</option>
-              <option value="전체관리통장">전체관리통장</option>
+              {Object.values(ACCOUNT_TYPES).map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
             </select>
           </div>
           
