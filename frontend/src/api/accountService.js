@@ -98,6 +98,12 @@ export const transactionAPI = {
     const response = await api.delete(`/transactions/${id}`);
     return response.data;
   },
+
+  // 사용 가능한 년-월 목록 조회
+  getAvailableYearMonths: async () => {
+    const response = await api.get('/transactions/year-months/list');
+    return response.data;
+  },
 };
 
 // 카테고리 관련 API

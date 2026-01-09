@@ -209,3 +209,15 @@ def delete_transaction(transaction_id: int, db: Session = Depends(get_db)):
     db.delete(transaction)
     db.commit()
     return {"message": "삭제 완료"}
+
+
+@router.get("/year-months/list", response_model=List[str])
+def get_available_year_months(db: Session = Depends(get_db)):
+    """사용 가능한 년-월 목록 조회"""
+    year_months = db.query(models.Transaction.year_month)\
+        .filter(models.Transaction.year_month.isnot(None))\
+        .distinct()\
+        .order_by(models.Transaction.year_month.desc())\
+        .all()
+    
+    return [ym[0] for ym in year_months]

@@ -11,14 +11,17 @@ function TransactionTable({ refreshTrigger }) {
   const [newCategory, setNewCategory] = useState('');
   const [error, setError] = useState(null);
   const [accountType, setAccountType] = useState(ACCOUNT_TYPES.LIVING);
+  const [yearMonth, setYearMonth] = useState(''); // 전체 조회
+  const [availableYearMonths, setAvailableYearMonths] = useState([]);
 
   useEffect(() => {
     fetchCategories();
+    fetchAvailableYearMonths();
   }, []);
 
   useEffect(() => {
     fetchTransactions();
-  }, [refreshTrigger, accountType]);
+  }, [refreshTrigger, accountType, yearMonth]);
 
   const fetchCategories = async () => {
     try {
@@ -31,14 +34,30 @@ function TransactionTable({ refreshTrigger }) {
     }
   };
 
+  const fetchAvailableYearMonths = async () => {
+    try {
+      const result = await transactionAPI.getAvailableYearMonths();
+      setAvailableYearMonths(result);
+    } catch (error) {
+      console.error('년-월 목록 불러오기 실패:', error);
+    }
+  };
+
   const fetchTransactions = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await transactionAPI.getTransactions({ 
+      const params = { 
         limit: 200,
         account_type: accountType 
-      });
+      };
+      
+      // yearMonth가 선택된 경우에만 파라미터 추가
+      if (yearMonth) {
+        params.year_month = yearMonth;
+      }
+      
+      const data = await transactionAPI.getTransactions(params);
       setTransactions(data);
     } catch (error) {
       console.error('거래내역 불러오기 실패:', error);
@@ -116,22 +135,44 @@ function TransactionTable({ refreshTrigger }) {
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">거래내역</h2>
       
-      {/* 계좌 유형 선택 */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          계좌 유형
-        </label>
-        <select
-          value={accountType}
-          onChange={(e) => setAccountType(e.target.value)}
-          className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-        >
-          {Object.values(ACCOUNT_TYPES).map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
+      {/* 필터 영역 */}
+      <div className="mb-4 flex gap-4">
+        {/* 계좌 유형 선택 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            계좌 유형
+          </label>
+          <select
+            value={accountType}
+            onChange={(e) => setAccountType(e.target.value)}
+            className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            {Object.values(ACCOUNT_TYPES).map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 년-월 선택 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            조회 기간
+          </label>
+          <select
+            value={yearMonth}
+            onChange={(e) => setYearMonth(e.target.value)}
+            className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">전체</option>
+            {availableYearMonths.map((ym) => (
+              <option key={ym} value={ym}>
+                {ym}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
