@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { statisticsAPI } from '../api/accountService';
 import { ACCOUNT_TYPES } from '../constants/accountTypes';
+import { SEMANTIC_COLORS } from '../constants/colors';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D'];
 
@@ -90,7 +91,7 @@ function Statistics({ refreshTrigger }) {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-rose-500">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-start">
             <div className="flex-shrink-0">
@@ -125,9 +126,10 @@ function Statistics({ refreshTrigger }) {
 
   if (availableMonths.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="text-center text-gray-500">
-          데이터가 없습니다. Excel 파일을 업로드해주세요.
+      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-gray-400">
+        <div className="text-center text-gray-500 py-8">
+          <p className="text-lg font-semibold mb-2">📊 데이터가 없습니다</p>
+          <p className="text-sm">Excel 파일을 업로드해주세요.</p>
         </div>
       </div>
     );
@@ -136,7 +138,7 @@ function Statistics({ refreshTrigger }) {
   return (
     <div className="space-y-6">
       {/* 계좌 유형 및 월 선택 */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-blue-500">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -176,36 +178,36 @@ function Statistics({ refreshTrigger }) {
 
       {/* 월별 통계 */}
       {monthlyStats && (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">{selectedMonth} 월별 통계</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-green-500">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">📈 {selectedMonth} 월별 통계</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">시작 잔액</div>
+            <div className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors duration-200 transform hover:scale-105 cursor-default">
+              <div className="text-sm text-gray-600 font-medium">💰 시작 잔액</div>
               <div className="text-xl font-bold text-blue-600">
                 {monthlyStats.start_balance.toLocaleString()}원
               </div>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">총 수입</div>
+            <div className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors duration-200 transform hover:scale-105 cursor-default">
+              <div className="text-sm text-gray-600 font-medium">📥 총 수입</div>
               <div className="text-xl font-bold text-green-600">
                 +{monthlyStats.total_income.toLocaleString()}원
               </div>
             </div>
-            <div className="bg-red-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">총 지출</div>
+            <div className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors duration-200 transform hover:scale-105 cursor-default">
+              <div className="text-sm text-gray-600 font-medium">📤 총 지출</div>
               <div className="text-xl font-bold text-red-600">
                 -{monthlyStats.total_expense.toLocaleString()}원
               </div>
             </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">종료 잔액</div>
+            <div className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors duration-200 transform hover:scale-105 cursor-default">
+              <div className="text-sm text-gray-600 font-medium">💵 종료 잔액</div>
               <div className="text-xl font-bold text-purple-600">
                 {monthlyStats.end_balance.toLocaleString()}원
               </div>
             </div>
           </div>
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <div className="text-sm text-gray-600">순 증감</div>
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 transform hover:scale-105 cursor-default">
+            <div className="text-sm text-gray-600 font-medium">📊 순 증감</div>
             <div className={`text-2xl font-bold ${
               monthlyStats.net_change >= 0 ? 'text-green-600' : 'text-red-600'
             }`}>
@@ -218,8 +220,8 @@ function Statistics({ refreshTrigger }) {
 
       {/* 카테고리별 통계 */}
       {categoryStats.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">카테고리별 지출</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-indigo-500">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">🎯 카테고리별 지출</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 차트 */}
             <div className="h-80">
@@ -262,7 +264,7 @@ function Statistics({ refreshTrigger }) {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {categoryStats.map((stat, index) => (
-                    <tr key={stat.category}>
+                    <tr key={stat.category} className="hover:bg-blue-50 transition-colors duration-150">
                       <td className="px-4 py-2 text-sm">
                         <span
                           className="inline-block w-3 h-3 rounded-full mr-2"

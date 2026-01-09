@@ -3,6 +3,8 @@ import ExcelUpload from './components/ExcelUpload';
 import TransactionTable from './components/TransactionTable';
 import Statistics from './components/Statistics';
 import CategoryMappingManagement from './components/CategoryMappingManagement';
+import { GRADIENTS } from './constants/colors';
+import { HiUpload, HiViewList, HiChartBar, HiCog } from 'react-icons/hi';
 
 function App() {
   const [activeTab, setActiveTab] = useState('upload');
@@ -16,9 +18,12 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* 헤더 */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-3xl font-bold text-gray-900">가계부</h1>
+      <header className={`${GRADIENTS.ocean} shadow-lg`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">
+            💰 가계부
+          </h1>
+          <p className="text-blue-100 text-sm mt-1">스마트한 자산 관리의 시작</p>
         </div>
       </header>
 
@@ -28,42 +33,46 @@ function App() {
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('upload')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
                 activeTab === 'upload'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 transform scale-105'
+                  : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 hover:scale-105'
               }`}
             >
+              <HiUpload className="w-5 h-5" />
               파일 업로드
             </button>
             <button
               onClick={() => setActiveTab('transactions')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
                 activeTab === 'transactions'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 transform scale-105'
+                  : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 hover:scale-105'
               }`}
             >
+              <HiViewList className="w-5 h-5" />
               거래내역
             </button>
             <button
               onClick={() => setActiveTab('statistics')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
                 activeTab === 'statistics'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 transform scale-105'
+                  : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 hover:scale-105'
               }`}
             >
+              <HiChartBar className="w-5 h-5" />
               통계
             </button>
             <button
               onClick={() => setActiveTab('mappings')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
                 activeTab === 'mappings'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 transform scale-105'
+                  : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 hover:scale-105'
               }`}
             >
+              <HiCog className="w-5 h-5" />
               카테고리 매핑
             </button>
           </nav>

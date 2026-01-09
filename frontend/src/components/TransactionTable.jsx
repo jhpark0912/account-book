@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { transactionAPI, categoryAPI } from '../api/accountService';
 import { ACCOUNT_TYPES } from '../constants/accountTypes';
 import { TRANSACTION_CATEGORIES } from '../constants/transactionCategories';
+import { getAmountColor, SEMANTIC_COLORS } from '../constants/colors';
 
 function TransactionTable({ refreshTrigger }) {
   const [transactions, setTransactions] = useState([]);
@@ -97,7 +98,7 @@ function TransactionTable({ refreshTrigger }) {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-rose-500">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-start">
             <div className="flex-shrink-0">
@@ -132,8 +133,8 @@ function TransactionTable({ refreshTrigger }) {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">거래내역</h2>
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-green-500">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 거래내역</h2>
       
       {/* 필터 영역 */}
       <div className="mb-4 flex gap-4">
@@ -175,9 +176,9 @@ function TransactionTable({ refreshTrigger }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">날짜</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">거래처</th>
@@ -189,8 +190,10 @@ function TransactionTable({ refreshTrigger }) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {transactions.map((transaction) => (
-              <tr key={transaction.id} className="hover:bg-gray-50">
+            {transactions.map((transaction, index) => (
+              <tr key={transaction.id} className={`transition-colors duration-150 ${
+                index % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-gray-50 hover:bg-blue-50'
+              }`}>
                 <td className="px-4 py-3 text-sm text-gray-900">
                   {transaction.transaction_date}
                 </td>
@@ -200,9 +203,7 @@ function TransactionTable({ refreshTrigger }) {
                 <td className="px-4 py-3 text-sm text-gray-500">
                   {transaction.transaction_type}
                 </td>
-                <td className={`px-4 py-3 text-sm text-right font-medium ${
-                  transaction.amount >= 0 ? 'text-blue-600' : 'text-red-600'
-                }`}>
+                <td className={`px-4 py-3 text-sm text-right font-semibold ${getAmountColor(transaction.amount)}`}>
                   {formatAmount(transaction.amount)}
                 </td>
                 <td className="px-4 py-3 text-sm text-right text-gray-900">
@@ -255,8 +256,9 @@ function TransactionTable({ refreshTrigger }) {
         </table>
 
         {transactions.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            거래내역이 없습니다. Excel 파일을 업로드해주세요.
+          <div className="text-center py-12 text-gray-500">
+            <p className="text-lg font-semibold mb-2">📝 거래내역이 없습니다</p>
+            <p className="text-sm">Excel 파일을 업로드해주세요.</p>
           </div>
         )}
       </div>

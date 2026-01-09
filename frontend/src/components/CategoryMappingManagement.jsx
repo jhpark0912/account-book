@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { categoryAPI } from '../api/accountService';
 import { TRANSACTION_CATEGORIES } from '../constants/transactionCategories';
+import { SEMANTIC_COLORS } from '../constants/colors';
 
 function CategoryMappingManagement() {
   const [mappings, setMappings] = useState([]);
@@ -119,24 +120,24 @@ function CategoryMappingManagement() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="text-red-600 mb-4">
-          <p className="font-semibold">오류 발생</p>
+      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-rose-500">
+        <div className={`${SEMANTIC_COLORS.expense.bg} ${SEMANTIC_COLORS.expense.text} p-4 rounded-lg mb-4 border-l-4 ${SEMANTIC_COLORS.expense.border}`}>
+          <p className="font-semibold">⚠️ 오류 발생</p>
           <p>{error}</p>
         </div>
         <button
           onClick={fetchMappings}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg font-semibold"
         >
-          다시 시도
+          🔄 다시 시도
         </button>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">카테고리 매핑 관리</h2>
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-purple-500">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">⚙️ 카테고리 매핑 관리</h2>
       <p className="text-gray-600 mb-6">
         거래처 키워드와 카테고리를 매핑하여 자동 분류를 설정합니다.
       </p>
@@ -174,9 +175,9 @@ function CategoryMappingManagement() {
           </div>
           <button
             onClick={handleCreate}
-            className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors"
+            className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg font-semibold"
           >
-            추가
+            ➕ 추가
           </button>
         </div>
       </div>
@@ -206,7 +207,7 @@ function CategoryMappingManagement() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {mappings.map((mapping) => (
-                <tr key={mapping.id} className="hover:bg-gray-50">
+                <tr key={mapping.id} className="hover:bg-blue-50 transition-colors duration-150">
                   {editingId === mapping.id ? (
                     <>
                       <td className="px-6 py-4">

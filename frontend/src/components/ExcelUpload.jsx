@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { transactionAPI } from '../api/accountService';
 import { ACCOUNT_TYPES } from '../constants/accountTypes';
+import { SEMANTIC_COLORS } from '../constants/colors';
 
 function ExcelUpload({ onUploadSuccess }) {
   const [file, setFile] = useState(null);
@@ -43,8 +44,8 @@ function ExcelUpload({ onUploadSuccess }) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Excel 파일 업로드</h2>
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-blue-500">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">📤 Excel 파일 업로드</h2>
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -83,17 +84,17 @@ function ExcelUpload({ onUploadSuccess }) {
         <button
           onClick={handleUpload}
           disabled={uploading || !file}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 font-semibold shadow-md hover:shadow-lg"
         >
-          {uploading ? '업로드 중...' : '업로드'}
+          {uploading ? '⏳ 업로드 중...' : '🚀 업로드'}
         </button>
 
         {message && (
           <div
-            className={`p-3 rounded-md ${
+            className={`p-4 rounded-lg font-medium transition-all duration-300 ${
               message.includes('오류')
-                ? 'bg-red-100 text-red-700'
-                : 'bg-green-100 text-green-700'
+                ? `${SEMANTIC_COLORS.expense.bg} ${SEMANTIC_COLORS.expense.text} border-l-4 ${SEMANTIC_COLORS.expense.border}`
+                : `${SEMANTIC_COLORS.success.bg} ${SEMANTIC_COLORS.success.text} border-l-4 ${SEMANTIC_COLORS.success.border}`
             }`}
           >
             {message}
