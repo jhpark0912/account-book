@@ -5,6 +5,25 @@ import { ACCOUNT_TYPES } from '../constants/accountTypes';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D'];
 
+// 커스텀 툴팁 컴포넌트
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
+        <p className="font-semibold text-gray-800">{data.category}</p>
+        <p className="text-sm text-gray-600">
+          금액: <span className="font-medium">{data.total_amount.toLocaleString()}원</span>
+        </p>
+        <p className="text-sm text-gray-600">
+          비율: <span className="font-medium">{data.percentage}%</span>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 function Statistics({ refreshTrigger }) {
   const [availableMonths, setAvailableMonths] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState('');
@@ -220,7 +239,7 @@ function Statistics({ refreshTrigger }) {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => `${value.toLocaleString()}원`} />
+                  <Tooltip content={<CustomTooltip />} />
                 </PieChart>
               </ResponsiveContainer>
             </div>

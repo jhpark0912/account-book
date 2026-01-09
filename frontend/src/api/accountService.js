@@ -120,6 +120,12 @@ export const categoryAPI = {
     return response.data;
   },
 
+  // 카테고리 매핑 수정
+  updateMapping: async (id, keyword, category) => {
+    const response = await api.put(`/categories/${id}`, { keyword, category });
+    return response.data;
+  },
+
   // 카테고리 매핑 삭제
   deleteMapping: async (id) => {
     const response = await api.delete(`/categories/${id}`);

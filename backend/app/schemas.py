@@ -45,6 +45,11 @@ class CategoryMapping(CategoryMappingBase):
         from_attributes = True
 
 
+class CategoryMappingResponse(CategoryMapping):
+    """카테고리 매핑 생성 응답 (업데이트된 거래 수 포함)"""
+    updated_transactions_count: int = 0
+
+
 class UploadResponse(BaseModel):
     message: str
     total_records: int

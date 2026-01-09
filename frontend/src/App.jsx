@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ExcelUpload from './components/ExcelUpload';
 import TransactionTable from './components/TransactionTable';
 import Statistics from './components/Statistics';
+import CategoryMappingManagement from './components/CategoryMappingManagement';
 
 function App() {
   const [activeTab, setActiveTab] = useState('upload');
@@ -55,6 +56,16 @@ function App() {
             >
               통계
             </button>
+            <button
+              onClick={() => setActiveTab('mappings')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'mappings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              카테고리 매핑
+            </button>
           </nav>
         </div>
       </div>
@@ -64,6 +75,7 @@ function App() {
         {activeTab === 'upload' && <ExcelUpload onUploadSuccess={handleUploadSuccess} />}
         {activeTab === 'transactions' && <TransactionTable refreshTrigger={refreshTrigger} />}
         {activeTab === 'statistics' && <Statistics refreshTrigger={refreshTrigger} />}
+        {activeTab === 'mappings' && <CategoryMappingManagement />}
       </main>
     </div>
   );
