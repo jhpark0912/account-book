@@ -13,7 +13,14 @@
       "Bash(pip install:*)",
       "mcp__plugin_serena_serena__search_for_pattern",
       "mcp__plugin_serena_serena__replace_content",
-      "mcp__plugin_serena_serena__write_memory"
+      "mcp__plugin_serena_serena__write_memory",
+      "mcp__plugin_serena_serena__list_memories",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__plugin_serena_serena__create_text_file",
+      "Bash(npm run lint)",
+      "mcp__plugin_serena_serena__insert_after_symbol",
+      "mcp__plugin_serena_serena__insert_before_symbol",
+      "mcp__plugin_serena_serena__replace_symbol_body"
     ]
   }
 }
