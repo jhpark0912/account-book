@@ -22,7 +22,8 @@
       "mcp__plugin_serena_serena__insert_before_symbol",
       "mcp__plugin_serena_serena__replace_symbol_body",
       "Bash(npm install:*)",
-      "mcp__plugin_serena_serena__edit_memory"
+      "mcp__plugin_serena_serena__edit_memory",
+      "Bash(curl:*)"
     ]
   }
 }

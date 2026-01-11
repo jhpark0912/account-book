@@ -99,10 +99,127 @@ def get_category_statistics(year_month: str, account_type: str = None, db: Sessi
 def get_available_months(account_type: str = None, db: Session = Depends(get_db)):
     """조회 가능한 년월 목록"""
     query = db.query(models.Transaction.year_month).distinct()
-    
+
     if account_type:
         query = query.filter(models.Transaction.account_type == account_type)
-    
+
     results = query.all()
     months = sorted([r.year_month for r in results], reverse=True)
     return {"months": months}
+
+
+@router.get("/total-assets")
+def get_total_assets(account_type: str = None, db: Session = Depends(get_db)):
+    """전체 총자산 계산 - 각 계좌별 최신 잔액의 합"""
+    # 각 계좌번호별로 가장 최근 거래를 찾기
+    # account_number로 그룹화하고 각 그룹의 최신 거래를 가져옴
+
+    # 1. 모든 고유 계좌번호 조회
+    query = db.query(models.Transaction.account_number).distinct()
+    if account_type:
+        query = query.filter(models.Transaction.account_type == account_type)
+
+    account_numbers = [r.account_number for r in query.all() if r.account_number]
+
+    if not account_numbers:
+        return {
+            "total_assets": 0,
+            "account_count": 0,
+            "accounts": []
+        }
+
+    # 2. 각 계좌별 최신 거래의 잔액 조회
+    accounts_info = []
+    total_assets = 0
+
+    for account_number in account_numbers:
+        # 해당 계좌의 가장 최근 거래 조회
+        latest_transaction = db.query(models.Transaction).filter(
+            models.Transaction.account_number == account_number
+        )
+
+        if account_type:
+            latest_transaction = latest_transaction.filter(
+                models.Transaction.account_type == account_type
+            )
+
+        latest_transaction = latest_transaction.order_by(
+            models.Transaction.transaction_date.desc()
+        ).first()
+
+        if latest_transaction:
+            balance = latest_transaction.balance
+            total_assets += balance
+            accounts_info.append({
+                "account_number": account_number,
+                "account_type": latest_transaction.account_type,
+                "latest_balance": balance,
+                "last_transaction_date": latest_transaction.transaction_date,
+                "institution": latest_transaction.institution
+            })
+
+    return {
+        "total_assets": total_assets,
+        "account_count": len(accounts_info),
+        "accounts": accounts_info
+    }
+
+
+@router.get("/total-assets/{year_month}")
+def get_total_assets_by_month(year_month: str, account_type: str = None, db: Session = Depends(get_db)):
+    """특정 월의 총자산 계산 - 해당 월의 각 계좌별 마지막 잔액의 합"""
+    # 1. 해당 월에 거래가 있는 모든 고유 계좌번호 조회
+    query = db.query(models.Transaction.account_number).filter(
+        models.Transaction.year_month == year_month
+    ).distinct()
+
+    if account_type:
+        query = query.filter(models.Transaction.account_type == account_type)
+
+    account_numbers = [r.account_number for r in query.all() if r.account_number]
+
+    if not account_numbers:
+        return {
+            "year_month": year_month,
+            "total_assets": 0,
+            "account_count": 0,
+            "accounts": []
+        }
+
+    # 2. 각 계좌별 해당 월의 마지막 거래 잔액 조회
+    accounts_info = []
+    total_assets = 0
+
+    for account_number in account_numbers:
+        # 해당 계좌의 해당 월 마지막 거래 조회
+        latest_transaction = db.query(models.Transaction).filter(
+            models.Transaction.account_number == account_number,
+            models.Transaction.year_month == year_month
+        )
+
+        if account_type:
+            latest_transaction = latest_transaction.filter(
+                models.Transaction.account_type == account_type
+            )
+
+        latest_transaction = latest_transaction.order_by(
+            models.Transaction.transaction_date.desc()
+        ).first()
+
+        if latest_transaction:
+            balance = latest_transaction.balance
+            total_assets += balance
+            accounts_info.append({
+                "account_number": account_number,
+                "account_type": latest_transaction.account_type,
+                "latest_balance": balance,
+                "last_transaction_date": latest_transaction.transaction_date,
+                "institution": latest_transaction.institution
+            })
+
+    return {
+        "year_month": year_month,
+        "total_assets": total_assets,
+        "account_count": len(accounts_info),
+        "accounts": accounts_info
+    }

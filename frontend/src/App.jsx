@@ -1,13 +1,14 @@
 import { useState } from 'react';
+import Dashboard from './components/Dashboard';
 import ExcelUpload from './components/ExcelUpload';
 import TransactionTable from './components/TransactionTable';
 import Statistics from './components/Statistics';
 import CategoryMappingManagement from './components/CategoryMappingManagement';
 import { GRADIENTS } from './constants/colors';
-import { HiUpload, HiViewList, HiChartBar, HiCog } from 'react-icons/hi';
+import { HiHome, HiUpload, HiViewList, HiChartBar, HiCog } from 'react-icons/hi';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('upload');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleUploadSuccess = () => {
@@ -31,6 +32,17 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'dashboard'
+                  ? 'border-blue-500 text-blue-600 transform scale-105'
+                  : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 hover:scale-105'
+              }`}
+            >
+              <HiHome className="w-5 h-5" />
+              대시보드
+            </button>
             <button
               onClick={() => setActiveTab('upload')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
@@ -81,6 +93,7 @@ function App() {
 
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {activeTab === 'dashboard' && <Dashboard refreshTrigger={refreshTrigger} />}
         {activeTab === 'upload' && <ExcelUpload onUploadSuccess={handleUploadSuccess} />}
         {activeTab === 'transactions' && <TransactionTable refreshTrigger={refreshTrigger} />}
         {activeTab === 'statistics' && <Statistics refreshTrigger={refreshTrigger} />}

@@ -161,6 +161,20 @@ export const statisticsAPI = {
     const response = await api.get('/statistics/months', { params });
     return response.data;
   },
+
+  // 전체 총자산 조회 (모든 계좌의 최신 잔액 합계)
+  getTotalAssets: async (accountType = null) => {
+    const params = accountType ? { account_type: accountType } : {};
+    const response = await api.get('/statistics/total-assets', { params });
+    return response.data;
+  },
+
+  // 특정 월의 총자산 조회 (해당 월의 각 계좌별 마지막 잔액 합계)
+  getTotalAssetsByMonth: async (yearMonth, accountType = null) => {
+    const params = accountType ? { account_type: accountType } : {};
+    const response = await api.get(`/statistics/total-assets/${yearMonth}`, { params });
+    return response.data;
+  },
 };
 
 export default api;
