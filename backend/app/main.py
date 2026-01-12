@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from .database import engine, Base
-from .routers import transactions, categories, statistics
+from .routers import transactions, categories, statistics, card_transactions
 import logging
 import time
 
@@ -46,6 +46,7 @@ app.add_middleware(
 app.include_router(transactions.router, prefix="/api/transactions", tags=["Transactions"])
 app.include_router(categories.router, prefix="/api/categories", tags=["Categories"])
 app.include_router(statistics.router, prefix="/api/statistics", tags=["Statistics"])
+app.include_router(card_transactions.router, prefix="/api", tags=["Card Transactions"])
 
 
 @app.get("/")

@@ -24,7 +24,8 @@
       "Bash(npm install:*)",
       "mcp__plugin_serena_serena__edit_memory",
       "Bash(curl:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "mcp__plugin_serena_serena__find_file"
     ]
   }
 }
