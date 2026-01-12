@@ -3,6 +3,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { statisticsAPI } from '../api/accountService';
 import { ACCOUNT_TYPES } from '../constants/accountTypes';
 import { SEMANTIC_COLORS } from '../constants/colors';
+import LoadingSkeleton from './common/LoadingSkeleton';
+import EmptyState from './common/EmptyState';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D'];
 
@@ -121,16 +123,25 @@ function Statistics({ refreshTrigger }) {
   }
 
   if (loading) {
-    return <div className="text-center py-8">로딩 중...</div>;
+    return (
+      <div className="space-y-6">
+        <LoadingSkeleton type="card" count={1} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LoadingSkeleton type="chart" />
+          <LoadingSkeleton type="chart" />
+        </div>
+      </div>
+    );
   }
 
   if (availableMonths.length === 0) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-gray-400">
-        <div className="text-center text-gray-500 py-8">
-          <p className="text-lg font-semibold mb-2">📊 데이터가 없습니다</p>
-          <p className="text-sm">Excel 파일을 업로드해주세요.</p>
-        </div>
+        <EmptyState
+          icon="📊"
+          message="통계 데이터가 없습니다"
+          description="Excel 파일을 업로드하여 거래 내역을 추가하면 월별 통계와 카테고리별 분석을 확인할 수 있습니다."
+        />
       </div>
     );
   }

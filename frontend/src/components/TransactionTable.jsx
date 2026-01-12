@@ -3,6 +3,8 @@ import { transactionAPI, categoryAPI } from '../api/accountService';
 import { ACCOUNT_TYPES } from '../constants/accountTypes';
 import { TRANSACTION_CATEGORIES } from '../constants/transactionCategories';
 import { getAmountColor, SEMANTIC_COLORS } from '../constants/colors';
+import LoadingSkeleton from './common/LoadingSkeleton';
+import EmptyState from './common/EmptyState';
 
 function TransactionTable({ refreshTrigger }) {
   const [transactions, setTransactions] = useState([]);
@@ -14,6 +16,7 @@ function TransactionTable({ refreshTrigger }) {
   const [accountType, setAccountType] = useState(ACCOUNT_TYPES.LIVING);
   const [yearMonth, setYearMonth] = useState(''); // 전체 조회
   const [availableYearMonths, setAvailableYearMonths] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(''); // 검색어
 
   useEffect(() => {
     fetchCategories();
@@ -129,8 +132,37 @@ function TransactionTable({ refreshTrigger }) {
   }
 
   if (loading) {
-    return <div className="text-center py-8">로딩 중...</div>;
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-green-500">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 거래내역</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">거래일시</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">적요</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">거래유형</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">금액</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">카테고리</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <LoadingSkeleton type="table-row" count={10} />
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
   }
+
+  // 검색 필터링
+  const filteredTransactions = transactions.filter((transaction) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    const description = (transaction.description || '').toLowerCase();
+    const institution = (transaction.institution || '').toLowerCase();
+    return description.includes(search) || institution.includes(search);
+  });
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-l-4 border-green-500">
@@ -174,6 +206,33 @@ function TransactionTable({ refreshTrigger }) {
             ))}
           </select>
         </div>
+
+        {/* 검색 */}
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            검색
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="적요 또는 거래기관으로 검색..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-400">🔍</span>
+            </div>
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
@@ -190,7 +249,7 @@ function TransactionTable({ refreshTrigger }) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {transactions.map((transaction, index) => (
+            {filteredTransactions.map((transaction, index) => (
               <tr key={transaction.id} className={`transition-colors duration-150 ${
                 index % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-gray-50 hover:bg-blue-50'
               }`}>
@@ -255,13 +314,34 @@ function TransactionTable({ refreshTrigger }) {
           </tbody>
         </table>
 
-        {transactions.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            <p className="text-lg font-semibold mb-2">📝 거래내역이 없습니다</p>
-            <p className="text-sm">Excel 파일을 업로드해주세요.</p>
-          </div>
-        )}
+        {/* 빈 데이터 또는 검색 결과 없음 */}
+        {transactions.length === 0 ? (
+          <EmptyState
+            icon="📝"
+            message="거래내역이 없습니다"
+            description="Excel 파일을 업로드하면 거래 내역을 확인하고 관리할 수 있습니다."
+          />
+        ) : filteredTransactions.length === 0 ? (
+          <EmptyState
+            icon="🔍"
+            message="검색 결과가 없습니다"
+            description={`"${searchTerm}"에 해당하는 거래내역을 찾을 수 없습니다. 다른 검색어를 입력해보세요.`}
+          />
+        ) : null}
       </div>
+
+      {/* 검색 결과 개수 표시 */}
+      {transactions.length > 0 && (
+        <div className="mt-4 text-sm text-gray-500">
+          {searchTerm ? (
+            <span>
+              총 {transactions.length}건 중 <span className="font-semibold text-blue-600">{filteredTransactions.length}건</span> 검색됨
+            </span>
+          ) : (
+            <span>총 {transactions.length}건</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

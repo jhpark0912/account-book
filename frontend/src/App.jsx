@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import Dashboard from './components/Dashboard';
 import ExcelUpload from './components/ExcelUpload';
 import TransactionTable from './components/TransactionTable';
@@ -18,6 +19,28 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#fff',
+            color: '#363636',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       {/* 헤더 */}
       <header className={`${GRADIENTS.ocean} shadow-lg`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

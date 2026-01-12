@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { statisticsAPI, transactionAPI } from '../api/accountService';
 import { SEMANTIC_COLORS, GRADIENTS, getAmountColor } from '../constants/colors';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import LoadingSkeleton from './common/LoadingSkeleton';
+import EmptyState from './common/EmptyState';
 
 const Dashboard = ({ refreshTrigger }) => {
   const [currentMonthStats, setCurrentMonthStats] = useState(null);
@@ -139,8 +141,17 @@ const Dashboard = ({ refreshTrigger }) => {
   // 로딩 상태
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="space-y-6">
+        {/* 요약 카드 스켈레톤 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <LoadingSkeleton type="card" count={4} />
+        </div>
+        
+        {/* 차트 및 리스트 스켈레톤 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LoadingSkeleton type="chart" />
+          <LoadingSkeleton type="chart" />
+        </div>
       </div>
     );
   }
@@ -187,11 +198,6 @@ const Dashboard = ({ refreshTrigger }) => {
   };
 
   // 증감 계산
-  const netChangeRate = calculateChangeRate(
-    currentMonthStats?.net_change || 0,
-    previousMonthStats?.net_change || 0
-  );
-
   const incomeChangeRate = calculateChangeRate(
     currentMonthStats?.total_income || 0,
     previousMonthStats?.total_income || 0
@@ -253,9 +259,11 @@ const Dashboard = ({ refreshTrigger }) => {
             최근 거래
           </h3>
           {recentTransactions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p>최근 거래 내역이 없습니다.</p>
-            </div>
+            <EmptyState
+              icon="📝"
+              message="최근 거래 내역이 없습니다"
+              description="거래 내역을 추가하면 여기에 최근 5건이 표시됩니다."
+            />
           ) : (
             <div className="space-y-3">
               {recentTransactions.map((transaction, index) => (
@@ -286,9 +294,11 @@ const Dashboard = ({ refreshTrigger }) => {
             월별 추이 (최근 6개월)
           </h3>
           {monthlyTrend.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p>월별 추이 데이터가 없습니다.</p>
-            </div>
+            <EmptyState
+              icon="📊"
+              message="월별 추이 데이터가 없습니다"
+              description="거래 내역이 쌓이면 월별 수입/지출 추이를 확인할 수 있습니다."
+            />
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={monthlyTrend}>

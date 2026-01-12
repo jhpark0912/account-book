@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { categoryAPI } from '../api/accountService';
 import { TRANSACTION_CATEGORIES } from '../constants/transactionCategories';
 import { SEMANTIC_COLORS } from '../constants/colors';
+import ConfirmModal from './common/ConfirmModal';
+import EmptyState from './common/EmptyState';
 
 function CategoryMappingManagement() {
   const [mappings, setMappings] = useState([]);
@@ -17,6 +20,10 @@ function CategoryMappingManagement() {
   const [editingId, setEditingId] = useState(null);
   const [editKeyword, setEditKeyword] = useState('');
   const [editCategory, setEditCategory] = useState('');
+  
+  // 삭제 확인 모달용
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   useEffect(() => {
     fetchMappings();
@@ -59,7 +66,7 @@ function CategoryMappingManagement() {
 
   const handleCreate = async () => {
     if (!newKeyword.trim() || !newCategory) {
-      alert('키워드와 카테고리를 모두 입력해주세요.');
+      toast.error('키워드와 카테고리를 모두 입력해주세요.');
       return;
     }
     try {
@@ -70,13 +77,13 @@ function CategoryMappingManagement() {
       
       // 업데이트된 거래 수 피드백
       if (response.updated_transactions_count > 0) {
-        alert(`매핑이 추가되었고, ${response.updated_transactions_count}개의 기존 거래가 자동으로 분류되었습니다.`);
+        toast.success(`매핑이 추가되었고, ${response.updated_transactions_count}개의 기존 거래가 자동으로 분류되었습니다.`);
       } else {
-        alert('매핑이 추가되었습니다.');
+        toast.success('매핑이 추가되었습니다.');
       }
     } catch (error) {
       console.error('매핑 추가 실패:', error);
-      alert(getErrorMessage(error));
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -88,27 +95,35 @@ function CategoryMappingManagement() {
 
   const handleUpdate = async () => {
     if (!editKeyword.trim() || !editCategory) {
-      alert('키워드와 카테고리를 모두 입력해주세요.');
+      toast.error('키워드와 카테고리를 모두 입력해주세요.');
       return;
     }
     try {
       await categoryAPI.updateMapping(editingId, editKeyword.trim(), editCategory);
       setEditingId(null);
       fetchMappings();
+      toast.success('매핑이 수정되었습니다.');
     } catch (error) {
       console.error('매핑 수정 실패:', error);
-      alert(getErrorMessage(error));
+      toast.error(getErrorMessage(error));
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+  const handleDeleteClick = (id) => {
+    setDeleteTargetId(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     try {
-      await categoryAPI.deleteMapping(id);
+      await categoryAPI.deleteMapping(deleteTargetId);
       fetchMappings();
+      toast.success('매핑이 삭제되었습니다.');
     } catch (error) {
       console.error('매핑 삭제 실패:', error);
-      alert(getErrorMessage(error));
+      toast.error(getErrorMessage(error));
+    } finally {
+      setDeleteTargetId(null);
     }
   };
 
@@ -186,9 +201,11 @@ function CategoryMappingManagement() {
       {loading ? (
         <div className="text-center py-8 text-gray-500">로딩 중...</div>
       ) : mappings.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          등록된 매핑이 없습니다. 위에서 새 매핑을 추가해주세요.
-        </div>
+        <EmptyState
+          icon="⚙️"
+          message="등록된 매핑이 없습니다"
+          description="거래처 키워드와 카테고리를 매핑하면 자동으로 거래를 분류할 수 있습니다. 위에서 새 매핑을 추가해주세요."
+        />
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -262,7 +279,7 @@ function CategoryMappingManagement() {
                           수정
                         </button>
                         <button
-                          onClick={() => handleDelete(mapping.id)}
+                          onClick={() => handleDeleteClick(mapping.id)}
                           className="text-red-600 hover:text-red-800 font-medium"
                         >
                           삭제
@@ -283,6 +300,17 @@ function CategoryMappingManagement() {
           총 {mappings.length}개의 매핑이 등록되어 있습니다.
         </div>
       )}
+
+      {/* 삭제 확인 모달 */}
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="매핑 삭제"
+        message="정말 이 매핑을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        confirmText="삭제"
+        cancelText="취소"
+      />
     </div>
   );
 }

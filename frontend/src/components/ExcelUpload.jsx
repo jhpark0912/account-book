@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { transactionAPI } from '../api/accountService';
 import { ACCOUNT_TYPES } from '../constants/accountTypes';
 import { SEMANTIC_COLORS } from '../constants/colors';
@@ -20,7 +21,7 @@ function ExcelUpload({ onUploadSuccess }) {
 
   const handleUpload = async () => {
     if (!file) {
-      setMessage('파일을 선택해주세요.');
+      toast.error('파일을 선택해주세요.');
       return;
     }
 
@@ -29,15 +30,17 @@ function ExcelUpload({ onUploadSuccess }) {
 
     try {
       const result = await transactionAPI.uploadExcel(file, accountType);
-      setMessage(
-        `업로드 완료! 총 ${result.total_records}건 중 ${result.new_records}건 추가, ${result.duplicate_records}건 중복`
-      );
+      const successMessage = `업로드 완료! 총 ${result.total_records}건 중 ${result.new_records}건 추가, ${result.duplicate_records}건 중복`;
+      setMessage(successMessage);
+      toast.success(successMessage);
       setFile(null);
       if (onUploadSuccess) {
         onUploadSuccess();
       }
     } catch (error) {
-      setMessage(`오류: ${error.response?.data?.detail || error.message}`);
+      const errorMessage = `오류: ${error.response?.data?.detail || error.message}`;
+      setMessage(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
     }
