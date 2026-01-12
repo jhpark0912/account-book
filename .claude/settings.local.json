@@ -23,7 +23,8 @@
       "mcp__plugin_serena_serena__replace_symbol_body",
       "Bash(npm install:*)",
       "mcp__plugin_serena_serena__edit_memory",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(python:*)"
     ]
   }
 }
