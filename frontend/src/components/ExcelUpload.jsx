@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { transactionAPI } from '../api/accountService';
+import { cardTransactionAPI } from '../api/cardTransactionService';
 import { ACCOUNT_TYPES } from '../constants/accountTypes';
 import { SEMANTIC_COLORS } from '../constants/colors';
 
@@ -8,7 +9,9 @@ function ExcelUpload({ onUploadSuccess }) {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
+  const [fileType, setFileType] = useState('toss'); // 'toss' or 'samsung'
   const [accountType, setAccountType] = useState(ACCOUNT_TYPES.LIVING);
+  const [cardHolder, setCardHolder] = useState(''); // Samsung 카드 소유자
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -25,11 +28,22 @@ function ExcelUpload({ onUploadSuccess }) {
       return;
     }
 
+    if (fileType === 'samsung' && !cardHolder.trim()) {
+      toast.error('카드 소유자 이름을 입력해주세요.');
+      return;
+    }
+
     setUploading(true);
     setMessage('');
 
     try {
-      const result = await transactionAPI.uploadExcel(file, accountType);
+      let result;
+      if (fileType === 'samsung') {
+        result = await cardTransactionAPI.uploadExcel(file, cardHolder.trim());
+      } else {
+        result = await transactionAPI.uploadExcel(file, accountType);
+      }
+      
       const successMessage = `업로드 완료! 총 ${result.total_records}건 중 ${result.new_records}건 추가, ${result.duplicate_records}건 중복`;
       setMessage(successMessage);
       toast.success(successMessage);
@@ -52,20 +66,54 @@ function ExcelUpload({ onUploadSuccess }) {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            계좌 유형
+            파일 유형
           </label>
           <select
-            value={accountType}
-            onChange={handleAccountTypeChange}
+            value={fileType}
+            onChange={(e) => setFileType(e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
-            {Object.values(ACCOUNT_TYPES).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
+            <option value="toss">Toss 은행</option>
+            <option value="samsung">Samsung 카드</option>
           </select>
         </div>
+
+        {fileType === 'toss' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              계좌 유형
+            </label>
+            <select
+              value={accountType}
+              onChange={handleAccountTypeChange}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              {Object.values(ACCOUNT_TYPES).map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {fileType === 'samsung' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              💳 카드 소유자 이름 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={cardHolder}
+              onChange={(e) => setCardHolder(e.target.value)}
+              placeholder="예: 박지훈"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              이 카드 명세서의 소유자 이름을 입력하세요
+            </p>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

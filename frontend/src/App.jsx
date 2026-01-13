@@ -5,8 +5,10 @@ import ExcelUpload from './components/ExcelUpload';
 import TransactionTable from './components/TransactionTable';
 import Statistics from './components/Statistics';
 import CategoryMappingManagement from './components/CategoryMappingManagement';
+import CardTransactionTable from './components/CardTransactionTable';
+import CardStatistics from './components/CardStatistics';
 import { GRADIENTS } from './constants/colors';
-import { HiHome, HiUpload, HiViewList, HiChartBar, HiCog } from 'react-icons/hi';
+import { HiHome, HiUpload, HiViewList, HiChartBar, HiCog, HiCreditCard } from 'react-icons/hi';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -110,6 +112,28 @@ function App() {
               <HiCog className="w-5 h-5" />
               카테고리 매핑
             </button>
+            <button
+              onClick={() => setActiveTab('card-transactions')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'card-transactions'
+                  ? 'border-purple-500 text-purple-600 transform scale-105'
+                  : 'border-transparent text-gray-500 hover:text-purple-600 hover:border-purple-300 hover:scale-105'
+              }`}
+            >
+              <HiCreditCard className="w-5 h-5" />
+              카드 내역
+            </button>
+            <button
+              onClick={() => setActiveTab('card-statistics')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'card-statistics'
+                  ? 'border-purple-500 text-purple-600 transform scale-105'
+                  : 'border-transparent text-gray-500 hover:text-purple-600 hover:border-purple-300 hover:scale-105'
+              }`}
+            >
+              <HiChartBar className="w-5 h-5" />
+              카드 통계
+            </button>
           </nav>
         </div>
       </div>
@@ -121,6 +145,8 @@ function App() {
         {activeTab === 'transactions' && <TransactionTable refreshTrigger={refreshTrigger} />}
         {activeTab === 'statistics' && <Statistics refreshTrigger={refreshTrigger} />}
         {activeTab === 'mappings' && <CategoryMappingManagement />}
+        {activeTab === 'card-transactions' && <CardTransactionTable refreshTrigger={refreshTrigger} />}
+        {activeTab === 'card-statistics' && <CardStatistics refreshTrigger={refreshTrigger} />}
       </main>
     </div>
   );

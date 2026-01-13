@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
@@ -14,23 +14,26 @@ router = APIRouter(prefix="/card-transactions", tags=["card-transactions"])
 logger = logging.getLogger(__name__)
 
 
-def parse_samsung_card_excel(file_path: str) -> List[dict]:
-    """Samsung Card Excel 파일 파싱 (다중 시트)"""
+def parse_samsung_card_excel(file_path: str, card_holder: str) -> List[dict]:
+    """Samsung Card Excel 파일 파싱 (일시불/할부 시트별 처리)
+
+    Args:
+        file_path: Excel 파일 경로
+        card_holder: 카드 소유자 이름 (업로드 시 사용자가 입력)
+    """
     try:
         xls = pd.ExcelFile(file_path)
         all_transactions = []
-        
-        # 첫 2개 시트만 처리 (사용자 시트, 보통 해외이용/안내문 제외)
+
+        # 첫 2개 시트만 처리 (일시불, 할부)
         sheets_to_process = xls.sheet_names[:2]
-        logger.info(f"Processing sheets: {sheets_to_process}")
-        
+        logger.info(f"Processing sheets for user {card_holder}: {sheets_to_process}")
+
         for sheet_name in sheets_to_process:
             logger.info(f"Parsing sheet: {sheet_name}")
-            # skiprows=1: 첫 번째 빈 행 건너뛰기
-            df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=1)
-            
-            # 첫 행이 헤더이므로 다시 읽기
-            df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=1, header=0)
+            # skiprows=2: 제목 행과 빈 행 건너뛰기 (Row 0, 1)
+            # Row 2가 헤더, Row 3부터 데이터 시작
+            df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=2, header=0)
             
             # 합계 행 제외 (첫 번째 열이 NaN인 행)
             df = df[df.iloc[:, 0].notna()]
@@ -47,11 +50,19 @@ def parse_samsung_card_excel(file_path: str) -> List[dict]:
                         logger.warning(f"Invalid date format: {raw_date}")
                         continue
                     
-                    # Column 8: 원 (금액)
-                    amount = float(row.iloc[8])
+                    # Column 9: 원 (금액 - 실제 숫자 값)
+                    amount_val = row.iloc[9]
+                    
+                    # NaN 체크
+                    if pd.isna(amount_val):
+                        logger.warning(f"Amount is NaN for row: {row.iloc[2]}")
+                        continue
+                    
+                    amount = float(amount_val)
                     
                     transaction = {
-                        "card_holder": sheet_name,
+                        "card_holder": card_holder,  # 업로드 시 입력한 사용자
+                        "payment_type": sheet_name,  # 시트명 (일시불, 할부)
                         "transaction_date": trans_date,
                         "description": str(row.iloc[2]),  # 가맹점
                         "amount": -amount,  # 지출은 음수로 저장
@@ -95,11 +106,20 @@ def auto_categorize(description: str, memo: Optional[str], db: Session) -> Optio
 @router.post("/upload", response_model=schemas.UploadResponse)
 async def upload_excel(
     file: UploadFile = File(...),
+    card_holder: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Samsung Card Excel 파일 업로드 및 파싱"""
+    """Samsung Card Excel 파일 업로드 및 파싱
+
+    Args:
+        file: Samsung Card Excel 파일
+        card_holder: 카드 소유자 이름 (필수)
+    """
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="Excel 파일만 업로드 가능합니다.")
+
+    if not card_holder or not card_holder.strip():
+        raise HTTPException(status_code=400, detail="카드 소유자 이름을 입력해주세요.")
     
     # 파일 저장
     upload_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
@@ -111,16 +131,17 @@ async def upload_excel(
         f.write(content)
     
     try:
-        # Excel 파싱
-        transactions_data = parse_samsung_card_excel(file_path)
+        # Excel 파싱 (카드 소유자 정보 전달)
+        transactions_data = parse_samsung_card_excel(file_path, card_holder.strip())
         
         new_records = 0
         duplicate_records = 0
         
         for trans_data in transactions_data:
-            # 중복 체크 (같은 카드소유자, 날짜, 금액, 가맹점)
+            # 중복 체크 (같은 카드소유자, 결제유형, 날짜, 금액, 가맹점)
             existing = db.query(models.CardTransaction).filter(
                 models.CardTransaction.card_holder == trans_data["card_holder"],
+                models.CardTransaction.payment_type == trans_data["payment_type"],
                 models.CardTransaction.transaction_date == trans_data["transaction_date"],
                 models.CardTransaction.amount == trans_data["amount"],
                 models.CardTransaction.description == trans_data["description"]

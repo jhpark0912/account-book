@@ -35,7 +35,8 @@ class CardTransaction(Base):
     __tablename__ = "card_transactions"
 
     id = Column(Integer, primary_key=True, index=True)
-    card_holder = Column(String, nullable=False, index=True)  # 카드 사용자 (시트명)
+    card_holder = Column(String, nullable=False, index=True)  # 카드 사용자 (업로드 시 지정)
+    payment_type = Column(String, nullable=False, index=True)  # 결제 유형 (일시불, 할부)
     transaction_date = Column(String, nullable=False, index=True)  # 거래 일시 (YYYY.MM.DD)
     description = Column(String, nullable=False)  # 가맹점명
     amount = Column(Float, nullable=False)  # 거래 금액 (음수: 지출)

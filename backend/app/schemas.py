@@ -33,6 +33,7 @@ class Transaction(TransactionBase):
 class CardTransactionBase(BaseModel):
     """카드 거래내역 기본 스키마"""
     card_holder: str
+    payment_type: str  # 결제 유형 (일시불, 할부)
     transaction_date: str
     description: str
     amount: float
